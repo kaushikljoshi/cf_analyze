@@ -1,0 +1,9 @@
+input_file      first.xyz  #Name of the input xyz structure
+table_flag      3    #1 = lammps connection table, 2 = reax connection table, 3 = build_distance_based table
+ring_flag       1    #1 means identify carbon rings
+void_flag       1    #1 means identify voids. 
+periodic_flag   1    #1 means system is periodic. Dims should be in input_file
+grid_size       4.0  #Grid size for binning. Will be used only if table_flag is 1
+bo_cut_off      0.3  # bo cut-off for identifying molecules for lammps/reax connection table
+distance_cut_off 1.7 #This cut_off will be used to identify bonds based on interatomic distace. Default is 1.7
+empty_bin_cut_off 1   #If any bin contains atoms less than or equal to this number, then it will be tagged as empty
