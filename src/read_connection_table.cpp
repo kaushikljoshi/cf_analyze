@@ -20,7 +20,7 @@ void connection_table(istream myfile1, int frame_no, int natoms1, int hlines, at
      //string index_names[natoms1][20];
      string s1,s2,s3,sub;
      string temp[50];
-     int file_write_flag = 0 // 1 means write myfile2
+     int file_write_flag = 0; // 1 means write myfile2
      istringstream iss;
      ofstream myfile2;
     
@@ -74,7 +74,7 @@ void connection_table(istream myfile1, int frame_no, int natoms1, int hlines, at
                             
                             n1 = at_list1[frames][i].num_neighbors;
                             for(j=0;j<n1;j++){
-                                              n2 = at_list1[frames][i].neigh_indexes[j]
+                                              n2 = at_list1[frames][i].neigh_indexes[j];
                                               myfile2<< setw(2) << at_list1[frames][j].return_atomname() << " " << setw(10) << n2+1 << " " ;
                                               }
                             myfile2 << endl;

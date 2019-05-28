@@ -1,0 +1,82 @@
+Perfrom ring and void analysis from xyz structure. More details about methods can be found in
+the the paper.
+
+Running the code:
+1. The given makefile compiles without any problems on most of the linux versions
+2. Makefile will generate executable named "cf_analyze"
+
+The code needs two input files, "settings.txt" and input xyz structure. The name of the input
+structure should be provided in "settings.txt". "settings.txt" file contains keywords for analysis.
+Below is brief description of each keyword:
+
+"input_file" :Name of the input file. It should be in xyz format
+
+"table_flag" : How atom connectivity will be built (should be set to 3 for most of the cases). In the future,
+               we will add functionality so that user can perform ring analysis using ReaxFF connection table.
+
+"ring_flag"  : value of 1 means perform ring analysis. 
+
+"void_flag"  : value of 1 means perform void analysis
+
+"periodic_flag" : value of 1 means system is periodic. 
+                  For non-periodic systems, default cell size is 80 ang. So for non-periodic system that are 
+                  bigger than default size, use should provide appropriate cell parameters and set periodic_flag
+                  to 1. 
+
+"grid_size"     : Approximate bin size for dividing the system. The actual bin size is adjusted closest to this
+                  this number so that each bin will have same exact size in each dimension.
+
+"bo_cut_off"    :Cut-off bond-order to identify chemical bonds (only for ReaxFF simulations)
+
+"distance_cut_off" : The interatomic cut-off distance that will be used to identify neighbors/chemical bond (default is 1.7 ang)
+
+"empty_bin_cut_off" : The atom number cut-off for identifying empty bins (default is 1). Any bin with atoms more than this cut_off
+                      is tagged as "non-empty" bin.
+
+Input structure:
+1. The input structure should be in "xyz" format. The 2nd line of input structure should contain
+   cell size/dimension inforamtion in the following format:
+
+   x_low x_high y_low y_high z_low z_high alpha beta gamma.
+
+   x_low is lower cell bound and x_high is upper cell bound in x-direction. y and z-directions follow
+   similar terminology. alpha, beta and gamma are cell angles. Currently, code supports only orthogonal
+   cells (so all of them should be set to 90). 
+
+2. The first column of atom information section should be atom names like C, H,....(not numbers like 1,2,)
+
+Ring analysis: 
+Ring analysis will be performed if ring_flag is set to 1. 
+1. Code currently identifies only 3-9 member rings.
+2. The code has been tested for system containing 300,000 atoms or less. For bigger
+systems, the code may not end normally.
+3. The ring analysis is time consuming. For 300,000 atoms, it may take upto 30 mins
+   just for single frame.
+4. Follwing output files will be produced:
+   "rings_size_distribution.dat" : contains how many rings are present of each size
+   "cycles.dat"                  : contains data related to each ring. The first column
+                                   of each line is "ring_id", 2nd column is "ring_size" and the
+                                   remaining columns are atom_ids (from input xyz structure) that 
+                                   are part of the ring
+   "rings.xyz"                   : ring-center file in xyz format (can be directly loaded in vmd)
+                                   In this file, the ring_name is decided based on the ring size. 
+                                   Follwing map is used for assinging ring_names:
+                                   3(ring size): H, 4 : Li, 5: Be, 6:C, 7:N, 8:O, 9:F.
+   "6_ring_no_ring.xyz"          : In this files, atom names are changed according to ring size. Any atom
+                                   that is part of only 6-member ring is named as "C". All other atoms are
+                                   named as "O". (Mostly used for visulatization purposes).
+For multi-frame file, "cycles.dat" and "rings.xyz" files will be overwritten, meaning they will
+contain information of only last frame. However, "rings_size_distribution.dat" file will contain
+information of all frame.
+                                  
+Void analysis:
+void analysis will be performed if void_flag is set to 1. 
+1. By default, code will tag any box as empty if it contains less than 2 atoms. This
+   condition can be changed by changing "empty_bin_cut_off" number in "settings.txt" file.
+2. Void analysis should be performed on single frame. For multi-frame file, it will just 
+   overwrite output files. Hence, void information of only last frame will be avaliable. 
+3. Following output files will be generated:
+   "combined_void_faces.xyz" : Contains xyz coordinates of all the faces of all voids in one single file.
+                               This file can be directly loaded into vmd
+   "pore_vol_dist.dat"       : Pore size statistics
+
